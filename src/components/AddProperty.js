@@ -3,13 +3,6 @@ import React, { Component } from 'react';
 
 class AddProperty extends Component {
 
-/*autocompleteFormField = document.getElementById(`street-address-field`);
-autocomplete = new google.maps.places.Autocomplete((autocompleteFormField), {
-  types: [`address`],
-  componentRestrictions: [`us`],
-});*/
-
-
 static propTypes = {
 }
 constructor(props) {
@@ -67,6 +60,22 @@ this.place.address_components.forEach((component, index) => {
     this.refs[addressType].value = val;
   }
 })   
+const address =  this.refs["street_number"].value + " " + this.refs["route"].value;
+const cityStateZip = this.refs["locality"].value + this.refs["administrative_area_level_1"].value + this.refs["postal_code"].value;
+fetch("http://localhost:8080/getPropertyDetails?address="+address+"&cityStateZip="+cityStateZip)
+      .then(response => response.json())
+      .then(data => {
+                    console.log(data['UpdatedPropertyDetails:updatedPropertyDetails'].response.editedFacts);
+                    this.refs["bedrooms"].value = data['UpdatedPropertyDetails:updatedPropertyDetails'].response.editedFacts.bedrooms;
+                    this.refs["bathrooms"].value = data['UpdatedPropertyDetails:updatedPropertyDetails'].response.editedFacts.bathrooms
+                    this.refs["lotsize"].value = data['UpdatedPropertyDetails:updatedPropertyDetails'].response.editedFacts.lotSizeSqFt;
+                    this.refs["fsqft"].value = data['UpdatedPropertyDetails:updatedPropertyDetails'].response.editedFacts.finishedSqFt;
+                    this.refs["yearbuilt"].value = data['UpdatedPropertyDetails:updatedPropertyDetails'].response.editedFacts.yearBuilt;
+                    this.refs["type"].value = data['UpdatedPropertyDetails:updatedPropertyDetails'].response.editedFacts.useCode;
+                    this.refs["description"].value = data['UpdatedPropertyDetails:updatedPropertyDetails'].response.homeDescription;
+                    this.refs["others"].value = JSON.stringify(data['UpdatedPropertyDetails:updatedPropertyDetails'].response);
+                }
+          );
 }
 
     render() {
@@ -111,49 +120,50 @@ this.place.address_components.forEach((component, index) => {
                     </div>
                     <div className="form-group">
                       <label>Description</label>
-                      <textarea placeholder="Enter Description ..." rows={3} className="form-control" defaultValue={""} />
+                      <textarea ref="description" placeholder="Enter Description ..." rows={3} className="form-control" defaultValue={""} />
                     </div>	
                     <div className="row">
-                      <div className="col-sm-3 form-group">
+                      <div className="col-sm-4 form-group">
                         <label>Type</label>
-                        <select className="custom-select custom-select-lg mb-3">
+                        <select ref="type" className="custom-select custom-select-lg mb-3">
                           <option selected />
-                          <option value={1}>One</option>
-                          <option value={2}>Two</option>
-                          <option value={3}>Three</option>
+                          <option value="SingleFamily">Single family</option>
+                          <option value="1">Condo</option>
+                          <option value="2">Townhouse</option>
+                          <option value="3">Multi family</option>
+                          <option value="4">Apartment</option>
+                          <option value="5">Mobile / Manufactured</option>
+                          <option value="6">Coop Unit</option>
+                          <option value="7">Vacant land</option>
+                          <option value="8">Other</option>
                         </select>
                       </div>		
-                      <div className="col-sm-3 form-group">
+                      <div className="col-sm-4 form-group">
                         <label>Bed Rooms</label>
-                        <select className="custom-select custom-select-lg mb-3">
-                          <option selected />
-                          <option value={1}>One</option>
-                          <option value={2}>Two</option>
-                          <option value={3}>Three</option>
-                        </select>
+                        <input ref="bedrooms" type="text" placeholder="Ex: 4" className="form-control" />
                       </div>
-                      <div className="col-sm-3 form-group">
+                      <div className="col-sm-4 form-group">
                         <label>Bath Rooms</label>
-                        <select className="custom-select custom-select-lg mb-3">
-                          <option selected />
-                          <option value={1}>One</option>
-                          <option value={2}>Two</option>
-                          <option value={3}>Three</option>
-                        </select>
+                        <input ref="bathrooms" type="text" placeholder="Ex: 2.5" className="form-control" />
                       </div>
-                      <div className="col-sm-3 form-group">
-                        <label>Rent</label>
-                        <select className="custom-select custom-select-lg mb-3">
-                          <option selected />
-                          <option value={1}>One</option>
-                          <option value={2}>Two</option>
-                          <option value={3}>Three</option>
-                        </select>
-                      </div>	
-                    </div>						
+                    </div>	
+                    <div className="row">
+                      <div className="col-sm-4 form-group">
+                        <label>Finished square feet</label>
+                        <input ref="fsqft" type="text" placeholder="Ex: 1,587" className="form-control" />
+                      </div>		
+                      <div className="col-sm-4 form-group">
+                        <label>Lot size</label>
+                        <input ref="lotsize" type="text" placeholder="Ex: 7,840" className="form-control" />
+                      </div>
+                      <div className="col-sm-4 form-group">
+                        <label>Year built</label>
+                        <input ref="yearbuilt" type="text" placeholder="Ex: 2005" className="form-control" />
+                      </div>
+                    </div>					
                     <div className="form-group">
                       <label>Other Features</label>
-                      <textarea placeholder="Add Other Features here ..." rows={3} className="form-control" defaultValue={""} />
+                      <textarea ref="others" placeholder="Add Other Features here ..." rows={3} className="form-control" defaultValue={""} />
                     </div>			
                     <button type="button" className="btn btn-lg btn-info">Add Property</button>					
                   </div>
